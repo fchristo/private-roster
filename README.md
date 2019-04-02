@@ -24,7 +24,7 @@ For your convenience, scripts for setting up a Python virtual environment are pr
 To setup a Python 2.7 environment on MacOS or linux use the ``setup.sh`` script.
 
 ```bash
-hostname:user$ sh setup.sh
+hostname:username$ sh setup.sh
 ```
 
 For a Python 3 environment, use the ``setup3.sh`` script. Note that the ``openpyxl`` dependency requires Python >= 3.5.
@@ -34,8 +34,8 @@ For a Python 3 environment, use the ``setup3.sh`` script. Note that the ``openpy
 To setup a Python 2.7 environment on Windows use the ``setup.bat`` script.
 
 ```batch
-> setup.bat
+C:\Users\username\Documents\roster> setup.bat
 ```
 
-For a Python 3 environment, use the ``setup3.bat`` script.
+For a Python 3 environment, use the ``setup3.bat`` script. Note that the ``openpyxl`` dependency requires Python >= 3.5.
 
