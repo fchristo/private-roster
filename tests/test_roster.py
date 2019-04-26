@@ -1,7 +1,7 @@
 import unittest
 import pandas
 from openpyxl import load_workbook
-from roster import Roster
+from roster.roster import Roster
 
 class TestRoster(unittest.TestCase):
 
