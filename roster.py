@@ -1,3 +1,9 @@
+"""
+roster.py
+====================================
+A roster editor/ viewer for poor Mrs.Jones
+"""
+
 from openpyxl import load_workbook
 from openpyxl.utils.dataframe import dataframe_to_rows
 import pandas
@@ -8,13 +14,18 @@ def main():
 
 
 class Roster(object):
-    """A roster editor/ viewer for poor Mrs.Jones"""
+    """
+    A roster object
+    """
 
     def __enter__(self):
         self.roster = Roster(self.filename)
         return self
 
     def get_student_names(self):
+        """
+            Return a a list of all student names
+        """
         class_dataframe = pandas.DataFrame(self.sheet.values)
         """Gets and returns a complete list of all student's names"""
         student_names = []
@@ -27,7 +38,14 @@ class Roster(object):
         return student_names
 
     def get_student(self, student_identifier):
-        """Reads excel for student, creates the student if they don't exist, returns the student's ID and grades"""
+        """
+            Reads excel for student, creates the student if they don't exist, returns the student's ID and grades
+
+            Parameters
+            ---------
+            student_identifier
+                Either a full name as a string, or a student ID as an int
+        """
         class_dataframe = pandas.DataFrame(self.sheet.values)
         if isinstance(student_identifier, int):
             student_id = student_identifier
@@ -115,7 +133,14 @@ class Roster(object):
             raise Exception("Please enter either a full name or a student ID")
 
     def delete_student(self, student_identifier):
-        """Deletes a student from the workbook"""
+        """
+            Deletes a student from the workbook
+
+            Parameters
+            ---------
+            student_identifier
+                Either a full name as a string, or a student ID as an int
+        """
         class_dataframe = pandas.DataFrame(self.sheet.values)
         if isinstance(student_identifier, int):
             self._do_delete(self.student_workbook, student_identifier)
@@ -143,14 +168,31 @@ class Roster(object):
         self.save(updated_file[0] + "_Updated.xlsx")
 
     def save(self, output_filename: str, workbook=None):
-        """Save the passed in workbook, or save loaded workbook if not passed."""
+        """
+            Save the passed in workbook, or save loaded workbook if not passed.
+
+            Parameters
+            ---------
+            output_filename
+                Name of the file to save to
+
+            workbook
+                Workbook to save
+        """
         if workbook is None:
             workbook = self.student_workbook
 
         workbook.save(output_filename)
 
     def class_average(self, workbook=None):
-        """Read each student's sheet, get the GPA of each student, then return the GPA of the class"""
+        """
+            Read each student's sheet, get the GPA of each student, then return the GPA of the class
+
+            Parameters
+            ---------
+            workbook
+                Workbook to get students from
+        """
         if workbook is None:
             workbook = self.student_workbook
 
@@ -178,9 +220,13 @@ class Roster(object):
 
     def add_grades(self, student: dict):
         """
-        Add grades to a student's sheet
+            Add grades to a student's sheet
 
-        Input example: {"id": 1, "grades": [(3, 90), (12, 100), (1, 10)]}
+            Parameters
+            ---------
+            student
+                dictionary containing student ID and a list of assignments/grades.
+                Input example: {"id": 1, "grades": [(3, 90), (12, 100), (1, 10)]}
         """
         if student["id"]:
             sheet = self.student_workbook["Student_" + student["id"].__str__()]
@@ -220,6 +266,17 @@ class Roster(object):
 
     @staticmethod
     def _do_delete(workbook, student_id: int):
+        """
+            Logic to delete student from worksheet. Extrapolated to keep DRY
+
+            Parameters
+            ---------
+            workbook
+                the workbook to delete a student from
+
+            student_id
+                The student ID number
+        """
         workbook.remove(workbook["Student_" + str(student_id)])
         # Rename all the student sheets to be one less than they were
         for sheet in workbook.sheetnames:
@@ -244,8 +301,18 @@ class Roster(object):
         return workbook
 
     @staticmethod
-    def _write_default_fields(student_sheet, student_identifier):
-        """Fill out the default fields for a new student's sheet"""
+    def _write_default_fields(student_sheet, student_identifier: str):
+        """
+            Logic to fill out the default fields a newly created student sheet should have.
+
+            Parameters
+            ---------
+            student_sheet
+                the student sheet we are writing to
+
+            student_identifier
+                The student name
+        """
         rows = (
             ("Student ID", 1),
             ("Name", student_identifier),
