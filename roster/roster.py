@@ -5,7 +5,7 @@ import pandas
 
 def main():
     r = Roster("../Jones_2019.xlsx")
-    r.add_grades({"id": 3, "grades": [[2, 10], [5, 20], [12, 100]]})
+    r.delete_student('Allen Dalton')
 
 
 class Roster(object):
@@ -61,7 +61,7 @@ class Roster(object):
                     class_dataframe.loc[class_dataframe[2].isin(student_name)])  # get row of student based on name
                 student_id = student_dataframe[0].values[0]  # get student id from row
                 student_sheet = student_workbook["Student_" + student_id.__str__()]
-            else:
+            else:  # create a student
                 student_id = 1
                 # update all other students ID's in Roster and subsheets
                 for row in sheet.iter_rows(min_row=2, max_col=1, values_only=True):
@@ -107,7 +107,26 @@ class Roster(object):
             raise Exception('Please enter either a full name or a student ID')
 
     def delete_student(self, student_identifier):
-        pandas.read_excel(self.filename)
+        """Deletes a student from the workbook"""
+        student_workbook = load_workbook(self.filename)
+        sheet = student_workbook.active
+        class_dataframe = pandas.DataFrame(sheet.values)
+
+        if isinstance(student_identifier, int):
+            self._do_delete(student_workbook, student_identifier)
+        elif isinstance(student_identifier, str):
+            student_name = student_identifier.split(' ')
+            if class_dataframe[2].isin(student_name).any():  # check if student name exists
+                student_dataframe = pandas.DataFrame(
+                    class_dataframe.loc[class_dataframe[2].isin(student_name)])  # get row of student based on name
+                student_id = student_dataframe[0].values[0]  # get student id from row
+                self._do_delete(student_workbook, student_id)
+            else:
+                raise Exception("Please enter an existing student, or use get_student('student') to create one")
+        else:
+            raise Exception("To delete a student, provide a valid student ID or full name")
+
+        self.save("Jones_2019_Updated.xlsx", student_workbook)
 
     def save(self, output_filename: str, workbook=None):
         """Save the passed in workbook, or save loaded workbook if not passed."""
@@ -172,6 +191,29 @@ class Roster(object):
             self.save("Jones_2019_Updated.xlsx", student_workbook)
         else:
             raise Exception("Please enter a valid student ID")
+
+    @staticmethod
+    def _do_delete(workbook, student_id: int):
+        workbook.remove(workbook["Student_" + str(student_id)])
+        # Rename all the student sheets to be one less than they were
+        for sheet in workbook.sheetnames:
+            sheet_num = sheet.title()
+            sheet_num = sheet_num.split("_")
+
+            # check that student sheet is after deleted sheet
+            if sheet_num[0] != "Roster" and int(sheet_num[1]) > student_id:
+                workbook[sheet].cell(row=1, column=2).value = int(sheet_num[1]) - 1
+                workbook[sheet].title = "Student_" + (int(sheet_num[1]) - 1).__str__()
+
+        roster = workbook["Roster"]
+        roster.delete_rows(student_id + 1, 1)
+
+        # loop through each student's ID and decrease it by one if after deleted student
+        for row in roster.iter_rows(min_row=2, max_col=1):
+            for cell in row:
+                if cell.value > student_id:
+                    roster.cell(cell.row, cell.column).value = cell.value - 1
+
 
     @staticmethod
     def _write_default_fields(student_sheet, student_identifier):
