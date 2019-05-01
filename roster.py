@@ -4,8 +4,7 @@ import pandas
 
 
 def main():
-    r = Roster("Jones_2019.xlsx")
-    r.delete_student("Allen Dalton")
+    print("To execute this file's functions, use invoke <taskname>")
 
 
 class Roster(object):
@@ -23,7 +22,6 @@ class Roster(object):
         for row in self.sheet.iter_rows(min_row=2, max_col=1, values_only=True):
             for cell in row:
                 student_names.append(class_dataframe.loc[cell, 1] + ' ' + class_dataframe.loc[cell, 2])
-
         return student_names
 
     def get_student(self, student_identifier):
@@ -86,7 +84,8 @@ class Roster(object):
                 self.student_workbook.create_sheet('Student_1')
                 student_sheet = self.student_workbook['Student_1']
                 self._write_default_fields(student_sheet, student_identifier)
-                self.save("Jones_2019_Updated.xlsx", self.student_workbook)
+                updated_file = self.filename.split(".xlsx")
+                self.save(updated_file[0] + "_Updated.xlsx")
 
             grade_list = []
 
@@ -121,7 +120,8 @@ class Roster(object):
         else:
             raise Exception("To delete a student, provide a valid student ID or full name")
 
-        self.save("Jones_2019_Updated.xlsx")
+        updated_file = self.filename.split(".xlsx")
+        self.save(updated_file[0] + "_Updated.xlsx")
 
     def save(self, output_filename: str, workbook=None):
         """Save the passed in workbook, or save loaded workbook if not passed."""
@@ -133,7 +133,7 @@ class Roster(object):
     def class_average(self, workbook=None):
         """Read each student's sheet, get the GPA of each student, then return the GPA of the class"""
         if workbook is None:
-            workbook = load_workbook(self.filename)
+            workbook = self.student_workbook
 
         sheet = workbook.active
         grades_total = 0
@@ -185,7 +185,8 @@ class Roster(object):
                 for c_idx, value in enumerate(row, 1):
                     sheet.cell(row=r_idx, column=c_idx, value=value)
 
-            self.save("Jones_2019_Updated.xlsx")
+            updated_file = self.filename.split(".xlsx")
+            self.save(updated_file[0] + "_Updated.xlsx")
         else:
             raise Exception("Please enter a valid student ID")
 
