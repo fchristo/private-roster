@@ -45,7 +45,11 @@ def add_grades(ctx, student_dict, filename="Jones_2019.xlsx"):
         print(data)
         r.add_grades(data)
         updated_file = filename.split(".xlsx")[0] + "_Updated.xlsx"
-        print("Grades added. See " + updated_file + " or run invoke get_student(<student>) to review changes.")
+        print(
+            "Grades added. See "
+            + updated_file
+            + " or run invoke get_student(<student>) to review changes."
+        )
 
 
 def is_intstring(input_arg: str):
