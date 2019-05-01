@@ -52,6 +52,11 @@ def add_grades(ctx, student_dict, filename="Jones_2019.xlsx"):
         )
 
 
+@task
+def gen_docs(ctx):
+    ctx.run("sphinx-build -b html ./ _build")
+
+
 def is_intstring(input_arg: str):
     try:
         int(input_arg)
