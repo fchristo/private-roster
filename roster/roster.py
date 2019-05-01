@@ -1,10 +1,11 @@
 from openpyxl import load_workbook
+from openpyxl.utils.dataframe import dataframe_to_rows
 import pandas
 
 
 def main():
     r = Roster("../Jones_2019.xlsx")
-    r.class_average()
+    r.add_grades({"id": 3, "grades": [[2, 10], [5, 20], [12, 100]]})
 
 
 class Roster(object):
@@ -77,10 +78,10 @@ class Roster(object):
                     student_workbook["Student_" +
                                      student_num.__str__()].title = "Student_" + (student_num + 1).__str__()
 
-                #move all other students down one row
+                # move all other students down one row
                 sheet.move_range("A2:D8", rows=1)
 
-                #make new student Student_1
+                # make new student Student_1
                 sheet["A2"] = student_id
                 sheet["B2"] = student_name[0]
                 sheet["C2"] = student_name[1]
@@ -139,6 +140,38 @@ class Roster(object):
         avg_grade = grades_total / students_num
 
         return avg_grade
+
+    def add_grades(self, student: dict):
+        """Add grades to a student's sheet"""
+        student_workbook = load_workbook(self.filename)
+
+        if student["id"]:
+            sheet = student_workbook["Student_" + student["id"].__str__()]
+            student_dataframe = pandas.DataFrame(sheet.values)
+            grades_dataframe = pandas.DataFrame(student["grades"])
+
+            # iterate over all assignments in the student's sheet
+            for row in sheet.iter_rows(min_row=6, max_col=1, values_only=True):
+                for cell in row:
+                    # iterate over each assignment passed in
+                    for assignment in list(zip(*student["grades"]))[0]:
+                        # if assignment exists, update grade value
+                        if cell == assignment:
+                            student_dataframe.iloc[cell + 4][1] = \
+                                grades_dataframe[grades_dataframe[0] == cell].iat[0, 1]
+                        elif assignment > student_dataframe[0].iloc[-1]:  # if the assignment does not exist, add it
+                            assignment_dataframe = grades_dataframe.loc[grades_dataframe[0] == assignment]
+                            student_dataframe = student_dataframe.append(assignment_dataframe, ignore_index=True)
+
+            # Convert from pandas and apply changes to the actual worksheet
+            rows = dataframe_to_rows(student_dataframe, index=False, header=False)
+            for r_idx, row in enumerate(rows, 1):
+                for c_idx, value in enumerate(row, 1):
+                    sheet.cell(row=r_idx, column=c_idx, value=value)
+
+            self.save("Jones_2019_Updated.xlsx", student_workbook)
+        else:
+            raise Exception("Please enter a valid student ID")
 
     @staticmethod
     def _write_default_fields(student_sheet, student_identifier):
