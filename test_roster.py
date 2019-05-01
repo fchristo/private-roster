@@ -49,7 +49,7 @@ class TestRoster(unittest.TestCase):
         self.assertTrue(len(sheet_names) == 7)
         self.assertTrue(sheet_names[0] == "Roster")
         self.assertTrue(sheet_names[-1] == "Student_6")
-        self.assertTrue(wb.get_sheet_by_name("Student_3")["B7"] == 92)
+        self.assertTrue(wb.get_sheet_by_name("Student_3")["B7"] == 92)  # Shouldn't this have .value after the cell?
         wb.close()
 
 if __name__ == "__main__":
