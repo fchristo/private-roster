@@ -27,7 +27,6 @@ class Roster(object):
             Return a a list of all student names
         """
         class_dataframe = pandas.DataFrame(self.sheet.values)
-        """Gets and returns a complete list of all student's names"""
         student_names = []
 
         for row in self.sheet.iter_rows(min_row=2, max_col=1, values_only=True):
