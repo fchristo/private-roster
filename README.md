@@ -1,6 +1,6 @@
 # roster
 
-This is my submission for the Roster challenge proposed by Timothy Thomas for a job application. To execute the commands, invoke tasks have been made for your convenience. To generate documentation for the project, run invoke gen-docs and open index.html inside the generated _build directory
+This is my submission for the Roster challenge for a previous job application. To execute the commands, invoke tasks have been made for your convenience. To generate documentation for the project, run invoke gen-docs and open index.html inside the generated _build directory
 
 ## python setup
 
